@@ -9,7 +9,7 @@
             "value": "ci"
         },
         "container_private_repo": {
-            "value": "pjbgf.azurecr.io/sample/container-appservice:CI"
+            "value": "pjbgf.azurecr.io/sample/container-appservice"
         }
     }
 }
