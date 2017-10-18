@@ -1,0 +1,221 @@
+{
+    "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "project_name": {
+            "defaultValue": "container-appservice",
+            "type": "string"
+        },
+        "environment_name": {
+            "allowedValues": [ 
+                "ci",
+                "test",
+                "prod" 
+            ],
+            "defaultValue": "ci",
+            "type": "string"
+        },
+        "container_private_repo": {
+            "type": "string"
+        }
+    },
+    "variables": {
+        "instance_name": "[concat(parameters('environment_name'), '-', parameters('project_name'))]",
+        "hosting_plan_name": "[concat(variables('instance_name'), '-plan')]",
+        "hostname_binding": "[concat(variables('instance_name'), '.azurewebsites.net')]",
+        "container_full_setting": "[concat('DOCKER|', parameters('container_private_repo'))]"
+    },
+    "resources": [
+        {
+            "type": "Microsoft.Web/serverfarms",
+            "sku": {
+                "name": "S1",
+                "tier": "Standard",
+                "size": "S1",
+                "family": "S",
+                "capacity": 1
+            },
+            "kind": "linux",
+            "name": "[variables('hosting_plan_name')]",
+            "apiVersion": "2016-09-01",
+            "scale": null,
+            "location": "[resourceGroup().location]",
+            "properties": {
+                "name": "[variables('hosting_plan_name')]",
+                "workerTierName": null,
+                "adminSiteName": null,
+                "hostingEnvironmentProfile": null,
+                "perSiteScaling": false,
+                "reserved": true,
+                "targetWorkerCount": 0,
+                "targetWorkerSizeId": 0
+            },
+            "dependsOn": []
+        },
+        {
+            "type": "Microsoft.Web/sites",
+            "kind": "app,linux",
+            "name": "[variables('instance_name')]",
+            "apiVersion": "2016-08-01",
+            "location": "[resourceGroup().location]",
+            "scale": null,
+            "properties": {
+                "enabled": true,
+                "hostNameSslStates": [
+                    {
+                        "name": "[variables('hostname_binding')]",
+                        "sslState": "Disabled",
+                        "virtualIP": null,
+                        "thumbprint": null,
+                        "toUpdate": null,
+                        "hostType": "Standard"
+                    },
+                    {
+                        "name": "[concat(variables('instance_name'),'.scm.azurewebsites.net')]",
+                        "sslState": "Disabled",
+                        "virtualIP": null,
+                        "thumbprint": null,
+                        "toUpdate": null,
+                        "hostType": "Repository"
+                    }
+                ],
+                "serverFarmId": "[resourceId('Microsoft.Web/serverfarms', variables('hosting_plan_name'))]",
+                "reserved": true,
+                "siteConfig": {
+                    "appSettings": [
+                    ]
+                },
+                "scmSiteAlsoStopped": false,
+                "hostingEnvironmentProfile": null,
+                "clientAffinityEnabled": true,
+                "clientCertEnabled": false,
+                "hostNamesDisabled": false,
+                "containerSize": 0,
+                "dailyMemoryTimeQuota": 0,
+                "cloningInfo": null
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/serverfarms', variables('hosting_plan_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/config",
+            "name": "[concat(variables('instance_name'), '/web')]",
+            "apiVersion": "2016-08-01",
+            "location": "[resourceGroup().location]",
+            "scale": null,
+            "properties": {
+                "numberOfWorkers": "1",
+                "defaultDocuments": [
+                    "Default.html",
+                    "index.html",
+                    "hostingstart.html"
+                ],
+                "netFrameworkVersion": "v4.0",
+                "phpVersion": "",
+                "pythonVersion": "",
+                "nodeVersion": "",
+                "linuxFxVersion": "[variables('container_full_setting')]",
+                "requestTracingEnabled": false,
+                "remoteDebuggingEnabled": false,
+                "remoteDebuggingVersion": "VS2012",
+                "httpLoggingEnabled": false,
+                "logsDirectorySizeLimit": 35,
+                "detailedErrorLoggingEnabled": false,
+                "publishingUsername": "[concat('$', variables('instance_name'))]",
+                "publishingPassword": null,
+                "appSettings": [],
+                "metadata": null,
+                "connectionStrings": null,
+                "machineKey": null,
+                "handlerMappings": null,
+                "documentRoot": null,
+                "scmType": "None",
+                "use32BitWorkerProcess": true,
+                "webSocketsEnabled": false,
+                "alwaysOn": true,
+                "javaVersion": null,
+                "javaContainer": null,
+                "javaContainerVersion": null,
+                "appCommandLine": "",
+                "managedPipelineMode": "Integrated",
+                "virtualApplications": [
+                    {
+                        "virtualPath": "/",
+                        "physicalPath": "site\\wwwroot",
+                        "preloadEnabled": false,
+                        "virtualDirectories": null
+                    }
+                ],
+                "winAuthAdminState": 0,
+                "winAuthTenantState": 0,
+                "customAppPoolIdentityAdminState": false,
+                "customAppPoolIdentityTenantState": false,
+                "runtimeADUser": null,
+                "runtimeADUserPassword": null,
+                "loadBalancing": "LeastRequests",
+                "routingRules": [],
+                "experiments": {
+                    "rampUpRules": []
+                },
+                "limits": null,
+                "autoHealEnabled": false,
+                "autoHealRules": {
+                    "triggers": null,
+                    "actions": null
+                },
+                "tracingOptions": null,
+                "vnetName": "",
+                "siteAuthEnabled": false,
+                "siteAuthSettings": {
+                    "enabled": null,
+                    "unauthenticatedClientAction": null,
+                    "tokenStoreEnabled": null,
+                    "allowedExternalRedirectUrls": null,
+                    "defaultProvider": null,
+                    "clientId": null,
+                    "clientSecret": null,
+                    "issuer": null,
+                    "allowedAudiences": null,
+                    "additionalLoginParams": null,
+                    "isAadAutoProvisioned": false,
+                    "googleClientId": null,
+                    "googleClientSecret": null,
+                    "googleOAuthScopes": null,
+                    "facebookAppId": null,
+                    "facebookAppSecret": null,
+                    "facebookOAuthScopes": null,
+                    "twitterConsumerKey": null,
+                    "twitterConsumerSecret": null,
+                    "microsoftAccountClientId": null,
+                    "microsoftAccountClientSecret": null,
+                    "microsoftAccountOAuthScopes": null
+                },
+                "cors": null,
+                "push": null,
+                "apiDefinition": null,
+                "autoSwapSlotName": null,
+                "localMySqlEnabled": false,
+                "ipSecurityRestrictions": null
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', variables('instance_name'))]"
+            ]
+        },
+        {
+            "type": "Microsoft.Web/sites/hostNameBindings",
+            "name": "[concat(variables('instance_name'), '/', variables('hostname_binding'))]",
+            "apiVersion": "2016-08-01",
+            "location": "[resourceGroup().location]",
+            "scale": null,
+            "properties": {
+                "siteName": "twsts234",
+                "domainId": null,
+                "hostNameType": "Verified"
+            },
+            "dependsOn": [
+                "[resourceId('Microsoft.Web/sites', variables('instance_name'))]"
+            ]
+        }
+    ]
+}
