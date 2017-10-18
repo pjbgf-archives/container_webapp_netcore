@@ -8,7 +8,7 @@
         "environment_name": {
             "value": "ci"
         },
-        "container_private_repo": {
+        "docker_image_name_with_registry": {
             "value": "pjbgf.azurecr.io/sample/container-appservice"
         }
     }

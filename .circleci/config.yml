@@ -3,7 +3,7 @@ jobs:
 
   build:
     docker:
-      # todo: change image to one that contains both dotnet SDK and docker client
+      # TODO: change image to one that contains both dotnet SDK and docker client
       - image: microsoft/dotnet:sdk
     environment:
       DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
@@ -15,7 +15,8 @@ jobs:
       - run: dotnet test src/Sample.Tests
 
       # Once unit-tests pass, create docker image
-      # For security purposes, circleci requires this step to isolate remote docker commands.
+      # For security purposes, circleci requires this step to isolate remote docker commands. 
+      # More info at: https://circleci.com/docs/2.0/building-docker-images/
       - setup_remote_docker
       - run:
           name: Install Docker client
@@ -28,13 +29,51 @@ jobs:
 
       - run: |
           chmod a+x ./tools/*.sh
-          pwd
           ./tools/create-docker-image.sh
           docker login pjbgf.azurecr.io -u $DOCKER_REGISTRY_SERVER_USERNAME -p $DOCKER_REGISTRY_SERVER_PASSWORD
-          docker push pjbgf.azurecr.io/sample/container-appservice
+          docker push $DOCKER_IMAGE_NAME_WITH_REGISTRY
+
+
+  ci_provisioning:
+    docker:
+      - image: azuresdk/azure-cli-python
+    steps:
+      - checkout
+      - run: az login --service-principal -u $SERVICE_PRINCIPAL --password $SERVICE_PRINCIPAL_PASS --tenant $SERVICE_TENANT
+      - run: chmod a+x arm/deploy.sh
+      - run: cd arm && ./deploy.sh -i $DEPLOY_CI_SUBSCRIPTION_ID -g $DEPLOY_CI_RESOURCE_GROUP -n ci-auto-deploy -l $DEPLOY_CI_LOCATION
+      
+      # The two steps below are required for the WebApp to be able to work with containers. 
+      # Unfortunately, I found no other way to set it up completely through the ARM template.
+      - run: az webapp config container set --name $DEPLOY_CI_WEBAPP_NAME --resource-group $DEPLOY_CI_RESOURCE_GROUP --docker-custom-image-name $DOCKER_IMAGE_NAME_WITH_REGISTRY --docker-registry-server-url $DOCKER_REGISTRY_URI --docker-registry-server-user $DOCKER_REGISTRY_SERVER_USERNAME --docker-registry-server-password $DOCKER_REGISTRY_SERVER_PASSWORD
+      - run: az webapp restart --name $DEPLOY_CI_WEBAPP_NAME --resource-group $DEPLOY_CI_RESOURCE_GROUP
+
+
+  ci_smoke_test:
+    docker:
+      - image: microsoft/dotnet:sdk
+    steps:
+      # TODO: replace with Gherkin-based smoke tests 
+      - run: curl --url http://$DEPLOY_CI_WEBAPP_NAME.azurewebsites.net/health -S -X GET -i | grep '200 OK'
+
+
+  ci_delete:
+    docker:
+      - image: azuresdk/azure-cli-python
+    steps:
+      - run: az login --service-principal -u $SERVICE_PRINCIPAL --password $SERVICE_PRINCIPAL_PASS --tenant $SERVICE_TENANT
+      - run: az group delete --no-wait --yes --name $DEPLOY_CI_RESOURCE_GROUP
+
 
 workflows:
   version: 2
   build_and_test:
     jobs:
       - build
+      - ci_provisioning
+      - ci_smoke_test:
+          requires:
+            - ci_provisioning
+      - ci_delete:
+          requires:
+            - ci_smoke_test
