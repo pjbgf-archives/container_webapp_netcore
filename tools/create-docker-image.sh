@@ -3,8 +3,8 @@
 # 
 # Potentially something to review at a later stage.
 
-dotnet publish ../src/Sample.Web.Api/Sample.Web.Api.csproj -c Release -f netcoreapp2.0
+dotnet publish src/Sample.Web.Api/Sample.Web.Api.csproj -c Release -f netcoreapp2.0
 
-cp ../src/Dockerfile ../src/Sample.Web.Api/bin/Release/netcoreapp2.0/publish/
+cp src/Dockerfile src/Sample.Web.Api/bin/Release/netcoreapp2.0/publish/
 
-docker build --rm --no-cache -t pjbgf.azurecr.io/sample/container-appservice ../src/Sample.Web.Api/bin/Release/netcoreapp2.0/publish/
+docker build --rm --no-cache -t pjbgf.azurecr.io/sample/container-appservice src/Sample.Web.Api/bin/Release/netcoreapp2.0/publish/

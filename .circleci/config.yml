@@ -3,6 +3,7 @@ jobs:
 
   build:
     docker:
+      # todo: change image to one that contains both dotnet SDK and docker client
       - image: microsoft/dotnet:sdk
     environment:
       DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
@@ -12,6 +13,25 @@ jobs:
       - run: dotnet restore src
       - run: dotnet build src
       - run: dotnet test src/Sample.Tests
+
+      # Once unit-tests pass, create docker image
+      # For security purposes, circleci requires this step to isolate remote docker commands.
+      - setup_remote_docker
+      - run:
+          name: Install Docker client
+          command: |
+            set -x
+            VER="17.03.0-ce"
+            curl -L -o /tmp/docker-$VER.tgz https://get.docker.com/builds/Linux/x86_64/docker-$VER.tgz
+            tar -xz -C /tmp -f /tmp/docker-$VER.tgz
+            mv /tmp/docker/* /usr/bin
+
+      - run: |
+          chmod a+x ./tools/*.sh
+          pwd
+          ./tools/create-docker-image.sh
+          docker login pjbgf.azurecr.io -u $DOCKER_REGISTRY_SERVER_USERNAME -p $DOCKER_REGISTRY_SERVER_PASSWORD
+          docker push pjbgf.azurecr.io/sample/container-appservice
 
 workflows:
   version: 2
