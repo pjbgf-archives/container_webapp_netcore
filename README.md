@@ -1,12 +1,65 @@
 [![CircleCI](https://circleci.com/gh/pjbgf/container_appservice_walking_skeleton.svg?style=svg)](https://circleci.com/gh/pjbgf/container_appservice_walking_skeleton) 
 [![License](http://img.shields.io/:license-mit-blue.svg)](http://pjbgf.mit-license.org)  
 
-This is a sample of a walking skeleton for a .Net Core 2.0 web API, deployed as a docker container on Azure App Service. 
+## What's in the box?
 
-The continuous integration tool being used is CircleCI and the Image Repository is Azure Registry.
+This is a sample of a walking skeleton .Net Core 2.0 web API, deployed as a docker container on Azure App Service. 
+
+- Language: C#
+- Platform: .Net Core 2.0
+- Compute: Docker Container running on Azure App Service
+- Telemetry: AppInsights
+- Container Registry: Azure Container Registry
+
+The infrastructure required is defined as code, using ARM templates. The deployment pipeline is also defined as code using yml with CircleCI.
+
+## CI Pipeline
+
+The setup also includes a CircleCI pipeline with the following steps:
+
+1. Build
+    1. Restore 
+    1. Build 
+    1. Run unit tests
+    1. Generate Docker Image
+    1. Push Docker Image to Azure Private Registry
+2. Provision CI Environment  
+    2. Deploy ARM template  
+    2. Forces Container-mode on AppService (not fully compatible with ARM at the moment)
+3. Smoke Test CI  
+    3. Http Request onto health check end-point
+4. Delete CI Environment 
+
+  
+## Requirements  
+
+- Azure Subscription
+- Azure Container Registry
+- Service Principal for the Azure Subscription
+- Github account (free)
+- CircleCI account (free)
 
 
-#Roadmap
+## CI Variables
+
+In order for this example to work, your circle CI project will require the following variables:
+
+| Name        | Description | Example |  
+| ----------- | ----------- | ----------- |   
+| DEPLOY_CI_RESOURCE_GROUP | Name for resource group | ci-myapp-euw |
+| DEPLOY_CI_LOCATION | Location to create the resource group | West Europe |
+| DEPLOY_CI_SUBSCRIPTION_ID | Azure subscription id | < GUID > |	
+| DEPLOY_CI_WEBAPP_NAME | CI name of your web app. | *ci-myapp-euw*.azurewebsites.net |
+| DOCKER_REGISTRY_URI | Uri for your Azure Container Registry | https://name-goes-here.azurecr.io |
+| DOCKER_IMAGE_NAME_WITH_REGISTRY | Fully qualified image name. | name-goes-here.azurecr.io/foldername/imagename:tag |
+| DOCKER_REGISTRY_SERVER_USERNAME | User name to login onto the registry | Generally it is the same name as the registry. |
+| DOCKER_REGISTRY_SERVER_PASSWORD | Password to login onto the registry | Be creative. ;) |
+| SERVICE_PRINCIPAL | Name of your service principal account | circleci_deployment_account |
+| SERVICE_PRINCIPAL_PASS | Password for your service principal account | <Some random, big and complex string.> |
+| SERVICE_TENANT | Tenant Id of your azure active directory | < GUID > |
+
+
+## Roadmap
 
 - BDD framework to replace curl smoke test with Gherkin spec and prepare the project for ATDD approach.
 - Secret Management for development environments.
