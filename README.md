@@ -11,3 +11,5 @@ The continuous integration tool being used is CircleCI and the Image Repository 
 - BDD framework to replace curl smoke test with Gherkin spec and prepare the project for ATDD approach.
 - Secret Management for development environments.
 - KeyVault for non-dev environments.
+- Paired-regions.
+- Traffic Manager.
