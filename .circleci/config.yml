@@ -74,6 +74,6 @@ workflows:
       - ci_smoke_test:
           requires:
             - ci_provisioning
-      - ci_delete:
-          requires:
-            - ci_smoke_test
+#      - ci_delete:
+#          requires:
+#            - ci_smoke_test
