@@ -30,7 +30,7 @@ jobs:
       - run: |
           chmod a+x ./tools/*.sh
           ./tools/create-docker-image.sh
-          docker login pjbgf.azurecr.io -u $DOCKER_REGISTRY_SERVER_USERNAME -p $DOCKER_REGISTRY_SERVER_PASSWORD
+          docker login $DOCKER_REGISTRY_URI -u $DOCKER_REGISTRY_SERVER_USERNAME -p $DOCKER_REGISTRY_SERVER_PASSWORD
           docker push $DOCKER_IMAGE_NAME_WITH_REGISTRY
 
 
@@ -70,10 +70,13 @@ workflows:
   build_and_test:
     jobs:
       - build
+
       - ci_provisioning
+
       - ci_smoke_test:
           requires:
             - ci_provisioning
-#      - ci_delete:
-#          requires:
-#            - ci_smoke_test
+
+      - ci_delete:
+          requires:
+            - ci_smoke_test
