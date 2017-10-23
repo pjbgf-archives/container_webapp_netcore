@@ -6,10 +6,10 @@
             "value": "container-appservice"
         },
         "environment_name": {
-            "value": "ci"
+            "value": "prod"
         },
         "docker_image_name_with_registry": {
-            "value": "pjbgf.azurecr.io/sample/container-appservice"
+            "value": "pjbgf.azurecr.io/sample/container-appservice:latest"
         }
     }
 }
