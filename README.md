@@ -58,6 +58,7 @@ In order for this example to work, your circle CI project will require the follo
 | SERVICE_PRINCIPAL_PASS | Password for your service principal account | <Some random, big and complex string.> |
 | SERVICE_TENANT | Tenant Id of your azure active directory | < GUID > |
 
+To setup the variables more easily you may want to use this [script](https://github.com/pliyosan/create-tokens-variables-in-circle-ci).
 
 ## Roadmap
 
