@@ -3,8 +3,7 @@ jobs:
 
   build:
     docker:
-      # TODO: change image to one that contains both dotnet SDK and docker client
-      - image: microsoft/dotnet:sdk
+      - image: paulinhu/netcore-docker-build
     environment:
       DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
       DOTNET_CLI_TELEMETRY_OPTOUT: 1
@@ -18,21 +17,18 @@ jobs:
       # For security purposes, circleci requires this step to isolate remote docker commands. 
       # More info at: https://circleci.com/docs/2.0/building-docker-images/
       - setup_remote_docker
-      - run:
-          name: Install Docker client
-          command: |
-            set -x
-            VER="17.03.0-ce"
-            curl -L -o /tmp/docker-$VER.tgz https://get.docker.com/builds/Linux/x86_64/docker-$VER.tgz
-            tar -xz -C /tmp -f /tmp/docker-$VER.tgz
-            mv /tmp/docker/* /usr/bin
 
+      # This approach feels faster then the provided as example on Docker website using multi staged builds.
+      # https://docs.docker.com/engine/examples/dotnetcore/
+      # 
+      # Potentially something to review at a later stage.
       - run: |
-          chmod a+x ./tools/*.sh
-          ./tools/create-docker-image.sh
+          dotnet publish src/Sample.Web.Api/Sample.Web.Api.csproj -c Release -f netcoreapp2.0
+          cp src/Dockerfile src/Sample.Web.Api/bin/Release/netcoreapp2.0/publish/
+
+          docker build --rm --no-cache -t $DOCKER_IMAGE_NAME_WITH_REGISTRY src/Sample.Web.Api/bin/Release/netcoreapp2.0/publish/
           docker login $DOCKER_REGISTRY_URI -u $DOCKER_REGISTRY_SERVER_USERNAME -p $DOCKER_REGISTRY_SERVER_PASSWORD
           docker push $DOCKER_IMAGE_NAME_WITH_REGISTRY
-
 
   ci_provisioning:
     docker:
