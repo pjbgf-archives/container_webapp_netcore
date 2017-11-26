@@ -6,16 +6,17 @@ IFS=$'\n\t'
 # -o: prevents errors in a pipeline from being masked
 # IFS new value is less likely to cause confusing bugs when looping arrays or arguments (e.g. $@)
 
-usage() { echo "Usage: $0 -i <subscriptionId> -g <resourceGroupName> -n <deploymentName> -l <resourceGroupLocation>" 1>&2; exit 1; }
+usage() { echo "Usage: $0 -i <subscriptionId> -g <resourceGroupName> -n <deploymentName> -l <resourceGroupLocation> -p <parametersFile>" 1>&2; exit 1; }
 
 declare subscriptionId=""
 declare resourceGroupName=""
 declare deploymentName=""
 declare resourceGroupLocation=""
+declare parametersFile=""
 
 
 # Initialize parameters specified from command line
-while getopts ":i:g:n:l:" arg; do
+while getopts ":i:g:n:l:p:" arg; do
 	case "${arg}" in
 		i)
 			subscriptionId=${OPTARG}
@@ -29,6 +30,9 @@ while getopts ":i:g:n:l:" arg; do
 		l)
 			resourceGroupLocation=${OPTARG}
 			;;
+		p)
+ 			parametersFile=${OPTARG}
+ 			;;
 		esac
 done
 shift $((OPTIND-1))

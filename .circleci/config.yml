@@ -18,11 +18,9 @@ jobs:
       # More info at: https://circleci.com/docs/2.0/building-docker-images/
       - setup_remote_docker
 
-      # This approach feels faster then the provided as example on Docker website using multi staged builds.
-      # https://docs.docker.com/engine/examples/dotnetcore/
-      # 
-      # Potentially something to review at a later stage.
       - run: |
+          # This approach feels faster then the provided as example on Docker website using multi-staged builds.
+          # https://docs.docker.com/engine/examples/dotnetcore/
           dotnet publish src/Sample.Web.Api/Sample.Web.Api.csproj -c Release -f netcoreapp2.0
           cp src/Dockerfile src/Sample.Web.Api/bin/Release/netcoreapp2.0/publish/
 
@@ -36,8 +34,7 @@ jobs:
     steps:
       - checkout
       - run: az login --service-principal -u $SERVICE_PRINCIPAL --password $SERVICE_PRINCIPAL_PASS --tenant $SERVICE_TENANT
-      - run: chmod a+x arm/deploy.sh
-      - run: cd arm && ./deploy.sh -i $DEPLOY_CI_SUBSCRIPTION_ID -g $DEPLOY_CI_RESOURCE_GROUP -n ci-auto-deploy -l $DEPLOY_CI_LOCATION
+      - run: sh arm/deploy.sh -i $DEPLOY_CI_SUBSCRIPTION_ID -g $DEPLOY_CI_RESOURCE_GROUP -n ci-auto-deploy -l $DEPLOY_CI_LOCATION -p arm/parameters.build.json
       
       # The two steps below are required for the WebApp to be able to work with containers. 
       # Unfortunately, I found no other way to set it up completely through the ARM template.
