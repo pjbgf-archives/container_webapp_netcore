@@ -34,7 +34,7 @@ jobs:
     steps:
       - checkout
       - run: az login --service-principal -u $SERVICE_PRINCIPAL --password $SERVICE_PRINCIPAL_PASS --tenant $SERVICE_TENANT
-      - run: chmod a+x deploy.sh
+      - run: chmod a+x arm/deploy.sh
       - run: cd arm && ./deploy.sh -i $DEPLOY_CI_SUBSCRIPTION_ID -g $DEPLOY_CI_RESOURCE_GROUP -n ci-auto-deploy -l $DEPLOY_CI_LOCATION -p parameters.build.json
       
       # The two steps below are required for the WebApp to be able to work with containers. 
