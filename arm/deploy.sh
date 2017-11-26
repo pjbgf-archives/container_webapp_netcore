@@ -69,8 +69,8 @@ if [ ! -f "$templateFilePath" ]; then
 	exit 1
 fi
 
-if [ ! -f "$parametersFilePath" ]; then
-	echo "$parametersFilePath not found"
+if [ ! -f "$parametersFile" ]; then
+	echo "$parametersFile not found"
 	exit 1
 fi
 
@@ -110,7 +110,7 @@ fi
 echo "Starting deployment..."
 (
 	set -x
-	az group deployment create --name $deploymentName --resource-group $resourceGroupName --template-file $templateFilePath --parameters $parametersFilePath --debug
+	az group deployment create --name $deploymentName --resource-group $resourceGroupName --template-file $templateFilePath --parameters $parametersFile --debug
 )
 
 if [ $?  == 0 ];
