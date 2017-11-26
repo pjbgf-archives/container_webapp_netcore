@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Sample.Web.Api.Models;
 
 namespace Sample.Web.Api.Controllers
 {
@@ -7,7 +8,7 @@ namespace Sample.Web.Api.Controllers
         [HttpGet("health")]
         public IActionResult IsHealthy()
         {
-            return Ok();
+            return Ok(new HealthStatus());
         }
     }
 }

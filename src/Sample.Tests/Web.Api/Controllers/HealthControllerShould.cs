@@ -13,7 +13,7 @@ namespace Sample.Tests.Web.Api.Controllers
 
             var response = controller.IsHealthy();
 
-            Assert.IsAssignableFrom<OkResult>(response);
+            Assert.IsAssignableFrom<OkObjectResult>(response);
         }
     }
 }
