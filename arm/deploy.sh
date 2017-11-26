@@ -69,9 +69,6 @@ if [ ! -f "$templateFilePath" ]; then
 	exit 1
 fi
 
-#parameter file path
-parametersFilePath="parameters.json"
-
 if [ ! -f "$parametersFilePath" ]; then
 	echo "$parametersFilePath not found"
 	exit 1
