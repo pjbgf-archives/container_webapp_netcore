@@ -9,7 +9,7 @@
             "value": "ci"
         },
         "docker_image_name_with_registry": {
-            "value": "pjbgf.azurecr.io/sample/container-appservice"
+            "value": "YOUR-CR-NAME-GOES-HERE.azurecr.io/sample/container-appservice"
         }
     }
 }
