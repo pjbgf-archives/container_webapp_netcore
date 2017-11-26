@@ -8,8 +8,8 @@ set -euo pipefail
 declare variables='DEPLOY_CI_RESOURCE_GROUP=ci-container-appservice-euw
 DEPLOY_CI_LOCATION=westeurope
 DEPLOY_CI_WEBAPP_NAME=ci-container-appservice
-DOCKER_REGISTRY_URI=https://YOUR-CR-NAME-GOES-HERE.azurecr.io
-DOCKER_IMAGE_NAME_WITH_REGISTRY=YOUR-CR-NAME-GOES-HERE.azurecr.io/sample/container-appservice'
+DOCKER_REGISTRY_URI=https://pjbgf.azurecr.io
+DOCKER_IMAGE_NAME_WITH_REGISTRY=pjbgf.azurecr.io/sample/container-appservice'
 
 # For all sensitive variables below, call command line separately, this will help you not to commit secrets into your repo. :)
 #
