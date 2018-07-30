@@ -3,10 +3,10 @@
 
 ## What's in the box?
 
-This is a sample of a walking skeleton .Net Core 2.0 web API, deployed as a docker container on Azure App Service. 
+This is a sample of a walking skeleton .Net Core 2.1 web API, deployed as a docker container on Azure App Service. 
 
 - Language: C#
-- Platform: .Net Core 2.0
+- Platform: .Net Core 2.1
 - Compute: Docker Container running on Azure App Service
 - Telemetry: AppInsights
 - Container Registry: Azure Container Registry
