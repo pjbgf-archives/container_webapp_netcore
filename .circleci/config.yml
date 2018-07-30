@@ -3,7 +3,7 @@ jobs:
 
   build:
     docker:
-      - image: paulinhu/netcore-docker-build
+      - image: microsoft/dotnet:sdk
     environment:
       DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
       DOTNET_CLI_TELEMETRY_OPTOUT: 1
@@ -12,6 +12,7 @@ jobs:
       - run: dotnet restore src
       - run: dotnet build src
       - run: dotnet test src/Sample.Tests
+      - run: curl -fsSL get.docker.com -o get-docker.sh && sh get-docker.sh
 
       # Once unit-tests pass, create docker image
       # For security purposes, circleci requires this step to isolate remote docker commands. 
@@ -26,6 +27,9 @@ jobs:
   ci_provisioning:
     docker:
       - image: azuresdk/azure-cli-python
+    environment:
+      DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
+      DOTNET_CLI_TELEMETRY_OPTOUT: 1
     steps:
       - checkout
       - run: az login --service-principal -u $SERVICE_PRINCIPAL --password $SERVICE_PRINCIPAL_PASS --tenant $SERVICE_TENANT
@@ -41,6 +45,9 @@ jobs:
   ci_smoke_test:
     docker:
       - image: microsoft/dotnet:sdk
+    environment:
+      DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
+      DOTNET_CLI_TELEMETRY_OPTOUT: 1
     steps:
       # TODO: replace with Gherkin-based smoke tests 
       - run: curl --url http://$DEPLOY_CI_WEBAPP_NAME.azurewebsites.net/health -S -X GET -i | grep '200 OK'
@@ -49,6 +56,9 @@ jobs:
   ci_delete:
     docker:
       - image: azuresdk/azure-cli-python
+    environment:
+      DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
+      DOTNET_CLI_TELEMETRY_OPTOUT: 1
     steps:
       - run: az login --service-principal -u $SERVICE_PRINCIPAL --password $SERVICE_PRINCIPAL_PASS --tenant $SERVICE_TENANT
       - run: az group delete --no-wait --yes --name $DEPLOY_CI_RESOURCE_GROUP
